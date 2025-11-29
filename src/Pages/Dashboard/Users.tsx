@@ -93,11 +93,10 @@ const Users: React.FC = () => {
       key: "status",
       render: (isBanned: boolean) => (
         <span
-          className={`px-2 py-1 text-xs rounded-full ${
-            isBanned === false
-              ? "bg-[#3F51B5] text-white"
-              : "bg-red-500 text-white"
-          }`}
+          className={`px-2 py-1 text-xs rounded-full ${isBanned === false
+            ? "bg-[#3F51B5] text-white"
+            : "bg-red-500 text-white"
+            }`}
         >
           {isBanned === false ? "Active" : "Banned"}
         </span>
@@ -150,48 +149,26 @@ const Users: React.FC = () => {
     setIsModalVisible(true);
   };
 
-  const handleModalOk = async (): Promise<void> => {
+  const handleUserBan = async () => {
     try {
-      const values = await form.validateFields();
-      if (editingUser) {
-        // Update existing user status
-        try {
-          await updateUserStatus({
-            userId: editingUser.userId,
-            isBanned: values.isBanned,
-          }).unwrap();
-
-          message.success("User status updated successfully");
-          await refetch();
-          setIsModalVisible(false);
-          form.resetFields();
-          setEditingUser(null);
-        } catch (error: any) {
-          console.error("Update failed:", error);
-          message.error(
-            error?.data?.message || "Failed to update user status"
-          );
-        }
-      } else {
-        // Add new user
-        const newUser: UserData = {
-          key: Date.now().toString(),
-          userId: `USR${String(users.length + 1).padStart(3, "0")}`,
-          joinDate: new Date().toISOString().split("T")[0],
-          createdAt: new Date().toISOString(),
-          lastLogin: "Never",
-          status: values.isBanned ? "Banned" : "Active",
-          ...values,
-        };
-        setUsers([...users, newUser]);
-        setIsModalVisible(false);
-        form.resetFields();
-        message.success("User added successfully");
+      const res = await updateUserStatus({
+        userId: editingUser?.userId || "",
+        isBanned: editingUser?.isBanned || false,
+      }).unwrap();
+      if (res.success === true) {
+        message.success("User status updated successfully");
       }
+
+      await refetch();
+      setIsModalVisible(false);
+      form.resetFields();
+      setEditingUser(null);
+
     } catch (error) {
-      console.error("Validation failed:", error);
+      message.error("User status update failed");
     }
   };
+
 
   const handleModalCancel = (): void => {
     setIsModalVisible(false);
@@ -235,7 +212,7 @@ const Users: React.FC = () => {
       <Modal
         title={editingUser ? "Edit User Status" : "Add New User"}
         open={isModalVisible}
-        onOk={handleModalOk}
+        onOk={handleUserBan}
         onCancel={handleModalCancel}
         okText={editingUser ? "Update" : "Add"}
         confirmLoading={isUpdating}

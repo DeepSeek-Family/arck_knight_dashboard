@@ -1,35 +1,7 @@
 import { useOverviewQuery, useRecentProjectQuery } from "@/redux/apiSlices/homeSlice";
 import { Spin } from "antd";
-import { FileText, Users, Eye, ArrowUpRight, TrendingUp } from "lucide-react";
+import { FileText, Users, ArrowUpRight, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
-
-const projects = [
-  {
-    name: "Fiber Expansion",
-    user_name: "Expansion",
-    date: "18 Nov 2025",
-  },
-  {
-    name: "Downtown Fiber",
-    user_name: "Installation",
-    date: "01 Aug 2025",
-  },
-  {
-    name: "Rural Broad Band",
-    user_name: "Expansion",
-    date: "05 Jul 2025",
-  },
-  {
-    name: "Fiber Maintenance",
-    user_name: "Maintenance",
-    date: "18Jun 2025",
-  },
-  {
-    name: "Downtown Fiber",
-    user_name: "Installation",
-    date: "01 Aug 2025",
-  },
-];
 
 const Home: React.FC = () => {
   const { data, isLoading } = useOverviewQuery();
@@ -45,6 +17,7 @@ const Home: React.FC = () => {
   }
 
   const Overview = data?.data || [];
+  console.log("O", Overview);
   const RecentProject = recentProject?.data || [];
 
   const iconMapper: any = {
@@ -68,7 +41,7 @@ const Home: React.FC = () => {
           >
             {/* Background gradient circle */}
             <div
-              className={`absolute -top-10 -right-10 w-36 h-36 rounded-full opacity-20 bg-gradient-to-br ${stat.color} blur-3xl`}
+              className={`absolute -top-10 -right-10 w-36 h-36 rounded-full opacity-20 bg-gradient-to-br ${stat?.color} from-orange-400 to-orange-500 blur-3xl`}
             ></div>
 
             {/* Card content */}
