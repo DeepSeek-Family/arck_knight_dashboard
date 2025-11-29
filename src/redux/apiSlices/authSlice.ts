@@ -112,7 +112,7 @@ const authSlice = api.injectEndpoints({
         const token = localStorage.getItem("token");
         return {
           method: "PATCH",
-          url: "/admin/profile",
+          url: "/user",
           body: data,
           headers: {
             Authorization: token ? `Bearer ${JSON.parse(token)}` : "",

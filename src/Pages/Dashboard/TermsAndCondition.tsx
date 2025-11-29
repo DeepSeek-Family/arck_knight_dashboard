@@ -4,22 +4,22 @@ import Title from "../../components/common/Title";
 
 
 import rentMeLogo from "../../assets/navLogo.png";
+import { useCreateRuleMutation, useGetRulesQuery } from "@/redux/apiSlices/ruleSlice";
+import { message } from "antd";
 
 const TermsAndCondition = () => {
   const editor = useRef(null);
   const [content, setContent] = useState("");
 
-  const isLoading = false;
 
-  // const {
-  //   data: termsAndCondition,
-  //   isLoading,
-  //   refetch,
-  // } = useTermsAndConditionQuery(selectedTab);
+  const {
+    data,
+    isLoading,
+  } = useGetRulesQuery("terms");
 
-  // const [updateTermsAndConditions] = useUpdateTermsAndConditionsMutation();
 
-  // const termsAndCondition = [];
+  const [createRule, { isLoading: isCreating }] = useCreateRuleMutation()
+
 
   if (isLoading) {
     return (
@@ -29,27 +29,8 @@ const TermsAndCondition = () => {
     );
   }
 
-  // const termsAndConditionData = termsAndCondition;
+  const termsAndConditionData = data?.data;
 
-  // const termsDataSave = async () => {
-  //   const data = {
-  //     content: content,
-  //     userType: "USER",
-  //   };
-
-  // try {
-  // const res = await updateTermsAndConditions(data).unwrap();
-  // if (res.success) {
-  // toast.success("Terms and Conditions updated successfully");
-  // setContent(res.data.content);
-  // refetch();
-  //   } else {
-  //     toast.error("Something went wrong");
-  //   }
-  // } catch {
-  //   throw new Error("Something Is wrong at try");
-  // }
-  // };
 
   return (
     <div className="p-6 bg-white">
@@ -57,7 +38,7 @@ const TermsAndCondition = () => {
 
       <JoditEditor
         ref={editor}
-        value={content}
+        value={termsAndConditionData?.content || ''}
         onChange={(newContent) => {
           setContent(newContent);
         }}
@@ -65,12 +46,19 @@ const TermsAndCondition = () => {
 
       <div className="flex items-center justify-center mt-5">
         <button
-          // onClick={termsDataSave}
+          onClick={async () => {
+            await createRule({
+              type: "terms",
+              content: content || termsAndConditionData?.content
+            });
+            message.success("Terms and Conditions updated successfully");
+          }}
           type="submit"
           className="bg-primary text-white w-[160px] h-[42px] rounded-lg"
         >
-          Submit
+          {isCreating ? "Creating..." : "Submit"}
         </button>
+
       </div>
     </div>
   );

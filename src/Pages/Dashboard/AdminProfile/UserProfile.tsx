@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
-import { Button, Form, Input } from "antd";
+import { Button, Form, Input, message } from "antd";
 import { BiLeftArrowAlt } from "react-icons/bi";
 import { Link } from "react-router-dom";
 import { MdOutlineAddPhotoAlternate } from "react-icons/md";
-import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import logo from "../../../assets/randomProfile2.jpg";
 import rentMeLogo from "../../../assets/navLogo.png";
+import { useFetchAdminProfileQuery, useUpdateAdminProfileMutation } from "@/redux/apiSlices/authSlice";
+import { imageUrl } from "@/redux/api/baseApi";
 
-const baseUrl = import.meta.env.VITE_BASE_URL;
 
 interface FormValues {
   name: string;
@@ -31,12 +31,11 @@ const PersonalInfo = () => {
   const [file, setFile] = useState<File | null>(null);
   const [form] = Form.useForm();
 
-  const isLoading = false;
 
-  // const { data: fetchAdminProfile, isLoading } = useFetchAdminProfileQuery();
-  // const [updateAdminProfile] = useUpdateAdminProfileMutation();
+  const { data: fetchAdminProfile, isLoading } = useFetchAdminProfileQuery();
+  const [updateAdminProfile, { isLoading: isUpdating }] = useUpdateAdminProfileMutation();
 
-  const fetchAdminProfile: { data?: AdminData } = {};
+  // const fetchAdminProfile: { data?: AdminData } = {};
 
   const adminData = fetchAdminProfile?.data;
 
@@ -45,10 +44,10 @@ const PersonalInfo = () => {
       form.setFieldsValue({
         name: adminData?.name,
         email: adminData?.email,
-        address: adminData?.address,
+        address: adminData?.location,
         phone: adminData?.contact,
       });
-      setImgURL(`${baseUrl}${adminData?.profileImg}`);
+      setImgURL(`${imageUrl}${adminData?.image}`);
       setContact(adminData?.contact);
     }
   }, [form, adminData]);
@@ -74,25 +73,22 @@ const PersonalInfo = () => {
     try {
       const formData = new FormData();
       formData.append("name", values.name);
-      formData.append("email", values.email);
       formData.append("address", values.address);
       formData.append("contact", contact);
 
       if (file) {
         formData.append("image", file);
-      } else {
-        formData.append("imageUrl", imgURL || "");
+      } else if (imgURL) {
+        formData.append("imageUrl", imgURL);
       }
 
-      // const response = await updateAdminProfile(formData);
+      const response = await updateAdminProfile(formData as any).unwrap();
 
-      // if (response.data) {
-      //   toast.success(response?.data?.message);
-      // } else {
-      //   toast.error(response?.data?.message);
-      // }
-    } catch (error) {
+      message.success(response?.message || "Profile updated successfully!");
+
+    } catch (error: any) {
       console.error("Error updating form:", error);
+      message.error(error?.data?.message || "Failed to update profile");
     }
   };
 
@@ -127,10 +123,8 @@ const PersonalInfo = () => {
             <Form.Item
               name="email"
               label="Email"
-              rules={[
-                { type: "email", message: "Please enter a valid email" },
-                { required: true, message: "Please enter your email" },
-              ]}
+              // @ts-ignore
+              disabled={true}
             >
               <Input readOnly className="py-3 bg-gray-100 rounded-xl" />
             </Form.Item>
@@ -143,19 +137,12 @@ const PersonalInfo = () => {
             </Form.Item>
 
             <Form.Item
-              label="Phone"
               name="phone"
-              rules={[
-                { required: true, message: "Please enter your phone number" },
-              ]}
+              label="Phone"
+              initialValue={contact || ""}
+              rules={[{ required: true, message: "Please enter your Phone Number" }]}
             >
-              <PhoneInput
-                country="us"
-                value={contact}
-                onChange={setContact}
-                inputClass="!w-full !px-4 !py-3 !py-5 !ps-12 !border !border-gray-300 !rounded-lg !focus:outline-none !focus:ring-2 !focus:ring-blue-400"
-                containerClass="!w-full"
-              />
+              <Input className="py-3 bg-gray-100 rounded-xl" />
             </Form.Item>
 
             <Form.Item>
