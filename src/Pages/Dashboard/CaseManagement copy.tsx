@@ -8,29 +8,21 @@ import {
   Space,
   ConfigProvider,
   Tag,
-  message,
 } from "antd";
 import {
+  PlusOutlined,
   EyeOutlined,
-  // SearchOutlined,
+  SearchOutlined,
   DeleteOutlined,
   EditOutlined,
 } from "@ant-design/icons";
 import { useSearchParams } from "react-router-dom";
-import {
-  useGetProjectsQuery,
-  useGetCasesByProjectIdQuery,
-  useDeleteProjectMutation,
-  useDeleteCaseMutation,
-  useUpdateCaseMutation,
-} from "@/redux/apiSlices/caseManagementSlice";
+import { useGetCaseQuery } from "@/redux/apiSlices/caseManagementSlice";
 const CaseManagement = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState<boolean>(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const [selectedCase, setSelectedCase] = useState<any>(null);
-  const [selectedProject, setSelectedProject] = useState<string | null>(null);
-  const [selectedProjectName, setSelectedProjectName] = useState<string>("");
   const [editForm] = Form.useForm();
   const [cableDetails, setCableDetails] = useState<any[]>([]);
 
@@ -38,12 +30,6 @@ const CaseManagement = () => {
   const [searchText, setSearchText] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
-  const [isInitialized, setIsInitialized] = useState(false);
-
-  // Delete mutations
-  const [deleteProject] = useDeleteProjectMutation();
-  const [deleteCase] = useDeleteCaseMutation();
-  const [updateCase] = useUpdateCaseMutation();
 
   const queryParams = [
     { name: "page", value: String(page) },
@@ -53,37 +39,13 @@ const CaseManagement = () => {
     queryParams.push({ name: "searchTerm", value: searchText.trim() });
   }
 
-  console.log(page);
-
-  // Fetch projects (first level)
-  const { data: projectsResponse } = useGetProjectsQuery<{
+  const { data: response } = useGetCaseQuery<{
     data: any[];
     pagination?: { total: number };
   }>(queryParams);
 
-  // Fetch cases for selected project (second level)
-  const { data: casesResponse } = useGetCasesByProjectIdQuery(
-    selectedProject || "",
-    {
-      skip: !selectedProject,
-    }
-  );
-
-  const projectsTableData = useMemo(() => {
-    const items = (projectsResponse as any)?.data || [];
-    return items.map((item: any) => ({
-      key: item._id,
-      _id: item._id,
-      name: item.name || "-",
-      user: item.user || "-",
-      createdAt: item.createdAt || "-",
-      updatedAt: item.updatedAt || "-",
-      raw: item,
-    }));
-  }, [projectsResponse]);
-
-  const casesTableData = useMemo(() => {
-    const items = (casesResponse as any)?.data || [];
+  const tableData = useMemo(() => {
+    const items = (response as any)?.data || [];
     return items.map((item: any) => ({
       key: item._id,
       id: item._id,
@@ -96,7 +58,7 @@ const CaseManagement = () => {
       updatedAt: item.updatedAt || "-",
       raw: item,
     }));
-  }, [casesResponse]);
+  }, [response]);
 
   const handlePaginationChange = (newPage: number, newPageSize: number) => {
     setPage(newPage);
@@ -105,33 +67,8 @@ const CaseManagement = () => {
     }
   };
 
-  // Initialize from URL on mount only
+  // Sync URL params with state
   useEffect(() => {
-    const urlPage = searchParams.get("page");
-    const urlSearch = searchParams.get("searchTerm");
-    const urlProjectId = searchParams.get("projectId");
-
-    if (urlPage) setPage(Number(urlPage));
-    if (urlSearch) setSearchText(urlSearch);
-    if (urlProjectId) {
-      setSelectedProject(urlProjectId);
-      // Fetch project name from the projects list
-      if (projectsTableData.length > 0) {
-        const project = projectsTableData.find(
-          (p: any) => p._id === urlProjectId
-        );
-        if (project) {
-          setSelectedProjectName(project.name);
-        }
-      }
-    }
-    setIsInitialized(true);
-  }, []); // Empty dependency array - only run on mount
-
-  // Sync state to URL (after initialization)
-  useEffect(() => {
-    if (!isInitialized) return;
-
     const params: Record<string, any> = {};
 
     params.page = page;
@@ -141,101 +78,19 @@ const CaseManagement = () => {
       params.searchTerm = searchText.trim();
     }
 
-    if (selectedProject) {
-      params.projectId = selectedProject;
-    }
-
     setSearchParams(params);
-  }, [
-    page,
-    limit,
-    searchText,
-    selectedProject,
-    isInitialized,
-    setSearchParams,
-  ]);
+  }, [page, limit, searchText, setSearchParams]);
 
-  // Projects Table Columns (First Level)
-  const projectsColumns = [
-    {
-      title: "Id",
-      dataIndex: "_id",
-      key: "_id",
-      width: 60,
-      render: (_: any, __: any, index: number) => index + 1,
-    },
-    {
-      title: "Project Name",
-      dataIndex: "name",
-      key: "name",
-      width: 250,
-    },
-    {
-      title: "Created At",
-      dataIndex: "createdAt",
-      key: "createdAt",
-      width: 140,
-      render: (date: string) => {
-        if (!date || date === "-") return "-";
-        return new Date(date).toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-          year: "numeric",
-        });
-      },
-    },
-    {
-      title: "Action",
-      dataIndex: "action",
-      key: "action",
-      width: 100,
-      fixed: "right" as const,
-      render: (_: any, record: any) => {
-        return (
-          <Space>
-            <Button
-              type="primary"
-              size="small"
-              onClick={() => {
-                setSelectedProject(record._id);
-                setSelectedProjectName(record.name);
-              }}
-            >
-              <EyeOutlined /> View Cases
-            </Button>
-            <Button
-              danger
-              size="small"
-              onClick={() => {
-                Modal.confirm({
-                  title: "Delete Project",
-                  content: `Are you sure you want to delete the project "${record.name}"? This action cannot be undone.`,
-                  okText: "Delete",
-                  okType: "danger",
-                  cancelText: "Cancel",
-                  onOk: async () => {
-                    try {
-                      await deleteProject(record._id).unwrap();
-                      message.success("Project deleted successfully");
-                    } catch (error: any) {
-                      message.error(
-                        error?.data?.message || "Failed to delete project"
-                      );
-                    }
-                  },
-                });
-              }}
-            >
-              <DeleteOutlined /> Delete
-            </Button>
-          </Space>
-        );
-      },
-    },
-  ];
+  useEffect(() => {
+    const urlPage = searchParams.get("page");
+    const urlSearch = searchParams.get("searchTerm");
 
-  // Cases Table Columns (Second Level - Nested)
-  const casesColumns = [
+    if (urlPage) setPage(Number(urlPage));
+    if (urlSearch) setSearchText(urlSearch);
+  }, [searchParams]);
+
+  // Dummy data for staff
+  const columns = [
     {
       title: "Id",
       dataIndex: "id",
@@ -297,7 +152,7 @@ const CaseManagement = () => {
       fixed: "right" as const,
       render: (_: any, record: any) => {
         return (
-          <Space className="flex gap-5">
+          <Space>
             <EyeOutlined
               className="cursor-pointer text-blue-600 text-xl"
               onClick={() => {
@@ -319,37 +174,16 @@ const CaseManagement = () => {
                 setIsEditModalOpen(true);
               }}
             />
-            <DeleteOutlined
-              className="cursor-pointer text-red-600 text-xl"
-              onClick={() => {
-                Modal.confirm({
-                  title: "Delete Case",
-                  content: `Are you sure you want to delete the case "${record.raw.case_name}"? This action cannot be undone.`,
-                  okText: "Delete",
-                  okType: "danger",
-                  cancelText: "Cancel",
-                  onOk: async () => {
-                    try {
-                      await deleteCase(record.raw._id).unwrap();
-                      message.success("Case deleted successfully");
-                    } catch (error: any) {
-                      message.error(
-                        error?.data?.message || "Failed to delete case"
-                      );
-                    }
-                  },
-                });
-              }}
-            />
+            <DeleteOutlined className="cursor-pointer text-red-600 text-xl" />
           </Space>
         );
       },
     },
   ];
 
-  // const showModal = () => {
-  //   setIsModalOpen(true);
-  // };
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
 
   const handleOk = () => {
     setIsModalOpen(false);
@@ -374,29 +208,34 @@ const CaseManagement = () => {
   const handleEditSave = async () => {
     try {
       const values = await editForm.validateFields();
-
-      const updateData: any = {
-        case_name: values.case_name,
-        case_location: values.case_location,
-        case_place: values.case_place,
-      };
-
-      // Only include cable_details if they were modified
-      if (cableDetails && cableDetails.length > 0) {
-        updateData.cable_details = cableDetails;
-      }
-
-      await updateCase({
-        caseId: selectedCase._id,
-        data: updateData,
-      }).unwrap();
-
-      message.success("Case updated successfully");
+      // TODO: Call API to update case
+      console.log("Updated values:", {
+        ...values,
+        cable_details: cableDetails,
+      });
       handleEditModalCancel();
-    } catch (error: any) {
-      message.error(error?.data?.message || "Failed to update case");
-      console.error("Update failed:", error);
+    } catch (error) {
+      console.error("Form validation failed:", error);
     }
+  };
+
+  const handleAddCable = () => {
+    setCableDetails([
+      ...cableDetails,
+      {
+        _id: Date.now().toString(),
+        tag_name: "",
+        year: "",
+        make: "",
+        foot_age: "",
+        selected_date: "",
+        note: "",
+      },
+    ]);
+  };
+
+  const handleRemoveCable = (index: number) => {
+    setCableDetails(cableDetails.filter((_, i) => i !== index));
   };
 
   const handleCableChange = (index: number, field: string, value: any) => {
@@ -410,46 +249,27 @@ const CaseManagement = () => {
 
   return (
     <div className="bg-white p-5">
-      {!selectedProject ? (
-        <>
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-3xl font-semibold">Project History</h2>
-            {/* <Input
-              placeholder="Search by case name"
-              style={{ width: 400, height: 50, borderRadius: 30 }}
-              onChange={(e) => {
-                setSearchText(e.target.value);
-                setPage(1);
-              }}
-              value={searchText}
-              prefix={<SearchOutlined className="text-primary" />}
-            /> */}
-          </div>
-        </>
-      ) : (
-        <>
-          <div className="flex justify-between items-center mb-4">
-            <div className="flex items-center gap-4">
-              <Button onClick={() => setSelectedProject(null)}>
-                ← Back to Projects
-              </Button>
-              <h2 className="text-xl font-semibold">
-                Case History of {selectedProjectName}
-              </h2>
-            </div>
-            {/* <Input
-              placeholder="Search by case name"
-              style={{ width: 400, height: 50, borderRadius: 30 }}
-              onChange={(e) => {
-                setSearchText(e.target.value);
-                setPage(1);
-              }}
-              value={searchText}
-              prefix={<SearchOutlined className="text-primary" />}
-            /> */}
-          </div>
-        </>
-      )}
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-semibold my-5">Case Management</h1>
+        <div className="flex items-center gap-5">
+          <Input
+            placeholder="Search by case name"
+            style={{ width: 400, height: 50, borderRadius: 30 }}
+            onChange={(e) => {
+              setSearchText(e.target.value);
+              setPage(1);
+            }}
+            value={searchText}
+            prefix={<SearchOutlined className="text-primary" />}
+          />
+          <Button
+            onClick={showModal}
+            className="bg-primary border-none text-white py-6 rounded-3xl px-6"
+          >
+            <PlusOutlined /> Add Case
+          </Button>
+        </div>
+      </div>
       <ConfigProvider
         theme={{
           components: {
@@ -462,32 +282,21 @@ const CaseManagement = () => {
           },
         }}
       >
-        {!selectedProject ? (
-          <Table
-            columns={projectsColumns}
-            dataSource={projectsTableData}
-            pagination={{
-              pageSize: limit,
-              total: (projectsResponse as any)?.pagination?.total || 0,
-              current: page,
-              showSizeChanger: true,
-              pageSizeOptions: ["10", "20", "50", "100"],
-              onChange: handlePaginationChange,
-            }}
-            rowKey={(record) => record.key}
-            scroll={{ x: 1000 }}
-            loading={false}
-          />
-        ) : (
-          <Table
-            columns={casesColumns}
-            dataSource={casesTableData}
-            pagination={false}
-            rowKey={(record) => record.key}
-            scroll={{ x: 1200 }}
-            loading={false}
-          />
-        )}
+        <Table
+          columns={columns}
+          dataSource={tableData}
+          pagination={{
+            pageSize: limit,
+            total: (response as any)?.pagination?.total || 0,
+            current: page,
+            showSizeChanger: true,
+            pageSizeOptions: ["10", "20", "50", "100"],
+            onChange: handlePaginationChange,
+          }}
+          rowKey={(record) => record.key}
+          scroll={{ x: 1200 }}
+          loading={false}
+        />
       </ConfigProvider>
 
       <Modal
@@ -542,7 +351,7 @@ const CaseManagement = () => {
           <Button
             key="close"
             onClick={handleDetailModalCancel}
-            className="border border-primary text-primary py-2 px-6 rounded-lg mt-6"
+            className="border border-primary text-primary py-2 px-6 rounded-lg"
           >
             Close
           </Button>,
@@ -694,8 +503,7 @@ const CaseManagement = () => {
         onOk={handleEditSave}
         onCancel={handleEditModalCancel}
         okButtonProps={{
-          className:
-            "bg-primary border-none text-white py-2 px-6 rounded-lg mt-6",
+          className: "bg-primary border-none text-white py-2 px-6 rounded-lg",
         }}
         cancelButtonProps={{
           className: "border border-primary text-primary py-2 px-6 rounded-lg",
@@ -743,6 +551,17 @@ const CaseManagement = () => {
 
           {/* Cable Specifications */}
           <div>
+            <div className="flex justify-between items-center mb-4 pb-2 border-b-2 border-primary">
+              <h3 className="text-lg font-semibold">Cable Specifications</h3>
+              <Button
+                type="primary"
+                className="bg-primary"
+                onClick={handleAddCable}
+              >
+                <PlusOutlined /> Add Cable
+              </Button>
+            </div>
+
             {cableDetails.length > 0 ? (
               <div className="space-y-4">
                 {cableDetails.map((cable: any, index: number) => (
@@ -752,6 +571,13 @@ const CaseManagement = () => {
                   >
                     <div className="flex justify-between items-center mb-3">
                       <h4 className="font-semibold">Cable #{index + 1}</h4>
+                      <Button
+                        danger
+                        size="small"
+                        onClick={() => handleRemoveCable(index)}
+                      >
+                        <DeleteOutlined /> Remove
+                      </Button>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
