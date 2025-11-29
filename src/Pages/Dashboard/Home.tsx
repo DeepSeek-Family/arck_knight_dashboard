@@ -7,6 +7,16 @@ const Home: React.FC = () => {
   const { data, isLoading } = useOverviewQuery();
   const { data: recentProject, isLoading: recentProjectLoading } = useRecentProjectQuery();
 
+  // Function to convert Tailwind color classes to CSS gradient
+  const getGradientStyle = (colorString: string) => {
+    const colorMap: any = {
+      'from-yellow-400 to-amber-500': 'linear-gradient(to bottom right, #FBBF24, #F59E0B)',
+      'from-blue-400 to-indigo-500': 'linear-gradient(to bottom right, #60A5FA, #6366F1)',
+      'from-orange-400 to-orange-500': 'linear-gradient(to bottom right, #FB923C, #F97316)',
+    };
+    
+    return colorMap[colorString] || 'linear-gradient(to bottom right, #60A5FA, #6366F1)';
+  };
 
   if (isLoading || recentProjectLoading) {
     return (
@@ -41,7 +51,10 @@ const Home: React.FC = () => {
           >
             {/* Background gradient circle */}
             <div
-              className={`absolute -top-10 -right-10 w-36 h-36 rounded-full opacity-20 bg-gradient-to-br ${stat?.color} from-orange-400 to-orange-500 blur-3xl`}
+              className="absolute -top-10 -right-10 w-36 h-36 rounded-full opacity-20 blur-3xl"
+              style={{
+                backgroundImage: getGradientStyle(stat?.color)
+              }}
             ></div>
 
             {/* Card content */}
@@ -59,7 +72,10 @@ const Home: React.FC = () => {
                 </div>
 
                 <div
-                  className={`p-3 rounded-xl shadow-md bg-gradient-to-br ${stat.color} flex items-center justify-center`}
+                  className="p-3 rounded-xl shadow-md flex items-center justify-center"
+                  style={{
+                    backgroundImage: getGradientStyle(stat.color)
+                  }}
                 >
                   {/* icon fix */}
                   {iconMapper[stat.icon] || (

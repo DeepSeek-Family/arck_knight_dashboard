@@ -10,9 +10,8 @@ const dashboardSlice = api.injectEndpoints({
 
         return {
           method: "GET",
-          url: `/dashboard/users${
-            queryParams.toString() ? "?" + queryParams.toString() : ""
-          }`,
+          url: `/dashboard/users${queryParams.toString() ? "?" + queryParams.toString() : ""
+            }`,
         };
       },
     }),
@@ -38,6 +37,16 @@ const dashboardSlice = api.injectEndpoints({
         };
       },
     }),
+    // add user
+    addUser: builder.mutation<any, any>({
+      query: (data) => {
+        return {
+          method: "POST",
+          url: "/dashboard/users",
+          body: data,
+        };
+      },
+    }),
   }),
 });
 
@@ -45,4 +54,6 @@ export const {
   useGeneralStatsQuery,
   useUpdateUserStatusMutation,
   useDeleteUserMutation,
+
+  useAddUserMutation,
 } = dashboardSlice;

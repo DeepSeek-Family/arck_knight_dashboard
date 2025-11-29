@@ -16,6 +16,7 @@ import {
   useGeneralStatsQuery,
   useUpdateUserStatusMutation,
   useDeleteUserMutation,
+  useAddUserMutation,
 } from "@/redux/apiSlices/dashboardSlice";
 
 const { Option } = Select;
@@ -36,7 +37,11 @@ interface UserData {
 interface UserFormValues {
   name: string;
   email: string;
+  contuct?: string;
   role: string;
+  password?: string;
+  confirmPassword?: string;
+  location?: string;
   isBanned: string | boolean;
 }
 
@@ -45,7 +50,7 @@ const Users: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [total, setTotal] = useState(0);
-
+  const [addUser] = useAddUserMutation();
   const { data, isLoading, refetch } = useGeneralStatsQuery({
     page: currentPage,
     limit: pageSize,
@@ -59,7 +64,6 @@ const Users: React.FC = () => {
 
   useEffect(() => {
     if (data?.data) {
-      // Map the API response to ensure userId is available
       const mappedUsers = (Array.isArray(data.data) ? data.data : []).map(
         (user: any) => ({
           key: user._id || user.id || user.userId || "",
@@ -67,7 +71,6 @@ const Users: React.FC = () => {
           name: user.name || "",
           email: user.email || "",
           role: user.role || "",
-          status: user.status || "",
           isBanned: user.isBanned || false,
           joinDate: user.joinDate || "",
           lastLogin: user.lastLogin || "",
@@ -75,10 +78,7 @@ const Users: React.FC = () => {
         })
       );
       setUsers(mappedUsers);
-      // Set total count from API response pagination object
       setTotal(data.pagination?.total || mappedUsers.length);
-      console.log("User Data in Users Page:", mappedUsers);
-      console.log("Total Users:", data.pagination?.total);
     }
   }, [data]);
 
@@ -120,11 +120,10 @@ const Users: React.FC = () => {
       key: "status",
       render: (isBanned: boolean) => (
         <span
-          className={`px-2 py-1 text-xs rounded-full ${
-            isBanned === false
-              ? "bg-[#3F51B5] text-white"
-              : "bg-red-500 text-white"
-          }`}
+          className={`px-2 py-1 text-xs rounded-full ${isBanned === false
+            ? "bg-[#3F51B5] text-white"
+            : "bg-red-500 text-white"
+            }`}
         >
           {isBanned === false ? "Active" : "Banned"}
         </span>
@@ -189,51 +188,48 @@ const Users: React.FC = () => {
     });
   };
 
-  const handleAdd = (): void => {
+  const handleAdd = async (): Promise<void> => {
     setEditingUser(null);
     form.resetFields();
     setIsModalVisible(true);
   };
 
-  const handleUserBan = async () => {
-    if (!editingUser) {
-      message.error("No user selected");
-      return;
-    }
-
+  const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
 
-      if (!editingUser.userId) {
-        message.error("User ID is missing");
-        return;
+      if (editingUser) {
+        // Edit user: only update isBanned
+        const isBannedValue = values.isBanned === "true";
+        await updateUserStatus({
+          userId: editingUser.userId,
+          isBanned: isBannedValue,
+        }).unwrap();
+        message.success("User status updated successfully");
+      } else {
+        // Add new user: send all fields + verified: true
+        const body = {
+          name: values.name,
+          email: values.email,
+          contuct: values.contuct,
+          role: values.role,
+          password: values.password,
+          confirmPassword: values.confirmPassword,
+          location: values.location,
+          isBanned: values.isBanned === "true",
+          verified: true,
+        };
+        await addUser(body).unwrap();
+        message.success("User added successfully");
       }
 
-      // Convert form value to boolean
-      // Form stores as string: "true" or "false"
-      const isBannedValue = values.isBanned === "true";
-
-      console.log(
-        "Form isBanned:",
-        values.isBanned,
-        "Type:",
-        typeof values.isBanned
-      );
-      console.log("Converted isBannedValue:", isBannedValue);
-
-      await updateUserStatus({
-        userId: editingUser.userId,
-        isBanned: isBannedValue,
-      }).unwrap();
-
-      message.success("User status updated successfully");
       await refetch();
       setIsModalVisible(false);
       form.resetFields();
       setEditingUser(null);
     } catch (error: any) {
-      console.error("Update error:", error);
-      message.error(error?.data?.message || "User status update failed");
+      console.error("Error:", error);
+      message.error(error?.data?.message || "Operation failed");
     }
   };
 
@@ -285,12 +281,13 @@ const Users: React.FC = () => {
       <Modal
         title={editingUser ? "Edit User Status" : "Add New User"}
         open={isModalVisible}
-        onOk={handleUserBan}
+        onOk={handleSubmit}
         onCancel={handleModalCancel}
         okText={editingUser ? "Update" : "Add"}
         confirmLoading={isUpdating}
       >
         <Form form={form} layout="vertical">
+          {/* Only editable for Add User */}
           <Form.Item
             name="name"
             label="Name"
@@ -308,7 +305,13 @@ const Users: React.FC = () => {
           >
             <Input disabled={!!editingUser} />
           </Form.Item>
-
+          <Form.Item
+            name="contuct"
+            label="Contact"
+            rules={[{ required: !editingUser, message: "Please enter contact" }]}
+          >
+            <Input disabled={!!editingUser} />
+          </Form.Item>
           <Form.Item
             name="role"
             label="Role"
@@ -319,6 +322,41 @@ const Users: React.FC = () => {
               <Option value="USER">USER</Option>
             </Select>
           </Form.Item>
+          {!editingUser && (
+            <>
+              <Form.Item
+                name="password"
+                label="Password"
+                rules={[{ required: true, message: "Please enter password" }]}
+              >
+                <Input.Password />
+              </Form.Item>
+              <Form.Item
+                name="confirmPassword"
+                label="Confirm Password"
+                rules={[
+                  { required: true, message: "Please confirm password" },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (!value || getFieldValue("password") === value) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject("Passwords do not match");
+                    },
+                  }),
+                ]}
+              >
+                <Input.Password />
+              </Form.Item>
+              <Form.Item
+                name="location"
+                label="Location"
+                rules={[{ required: true, message: "Please enter location" }]}
+              >
+                <Input />
+              </Form.Item>
+            </>
+          )}
           <Form.Item
             name="isBanned"
             label="Status"
