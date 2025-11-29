@@ -1,6 +1,6 @@
 
 import { Outlet } from "react-router-dom";
-import backgroundImage from "../../assets/salonGoLoginBg.png";
+// import backgroundImage from "../../assets/salonGoLoginBg.png";
 
 const Auth = () => {
   return (
@@ -10,7 +10,7 @@ const Auth = () => {
         height: "100vh",
       }}
     >
-      <div
+      {/* <div
         style={{
           backgroundImage: `url('${backgroundImage}')`,
           backgroundPosition: "center",
@@ -24,7 +24,7 @@ const Auth = () => {
           bottom: 0,
           zIndex: 1,
         }}
-      ></div>
+      ></div> */}
 
       <div
         style={{

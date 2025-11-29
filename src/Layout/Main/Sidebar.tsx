@@ -141,7 +141,7 @@ const Sidebar = () => {
           to={"/"}
           className="mb-10 flex items-center flex-col gap-2 justify-center py-4"
         >
-          <img src={logo} alt="" />
+          <img src={logo} alt="" className="h-[150px] w-auto" />
         </Link>
       </div>
       <Menu
