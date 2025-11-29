@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Table, Input } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
@@ -16,7 +15,6 @@ interface QuoteData {
 }
 
 const CustomerDetails: React.FC = () => {
-
   const quoteColumns: ColumnsType<QuoteData> = [
     {
       title: "Quote No",
@@ -58,9 +56,13 @@ const CustomerDetails: React.FC = () => {
       dataIndex: "status",
       key: "status",
       render: (status: string) => (
-        <span className={`px-2 py-1 rounded text-sm ${
-          status === "Delivered" ? "bg-green-100 text-green-800" : "bg-blue-100 text-blue-800"
-        }`}>
+        <span
+          className={`px-2 py-1 rounded text-sm ${
+            status === "Delivered"
+              ? "bg-green-100 text-green-800"
+              : "bg-blue-100 text-blue-800"
+          }`}
+        >
           {status}
         </span>
       ),
