@@ -23,10 +23,7 @@ const Home: React.FC = () => {
         "linear-gradient(to bottom right, #FB923C, #F97316)",
     };
 
-    return (
-      colorMap[colorString] ||
-      "linear-gradient(to bottom right, #60A5FA, #6366F1)"
-    );
+    return colorMap[colorString] || 'linear-gradient(to bottom right, #60A5FA, #6366F1)';
   };
 
   if (isLoading || recentProjectLoading) {
