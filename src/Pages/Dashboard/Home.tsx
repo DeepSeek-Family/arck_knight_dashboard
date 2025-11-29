@@ -14,7 +14,7 @@ const Home: React.FC = () => {
       'from-blue-400 to-indigo-500': 'linear-gradient(to bottom right, #60A5FA, #6366F1)',
       'from-orange-400 to-orange-500': 'linear-gradient(to bottom right, #FB923C, #F97316)',
     };
-    
+
     return colorMap[colorString] || 'linear-gradient(to bottom right, #60A5FA, #6366F1)';
   };
 

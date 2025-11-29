@@ -10,7 +10,7 @@ export default defineConfig({
     },
   },
   server: {
-    // host: "192.168.10.20",
-    // port: 3003,
+    host: "0.0.0.0",
+    port: 9001,
   },
 });
