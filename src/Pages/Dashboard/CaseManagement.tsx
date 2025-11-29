@@ -162,7 +162,7 @@ const CaseManagement = () => {
       dataIndex: "_id",
       key: "_id",
       width: 60,
-      render: (_: any, __: any, index: number) => index + 1,
+      render: (_: any, __: any, index: number) => (page - 1) * limit + index + 1,
     },
     {
       title: "Project Name",
