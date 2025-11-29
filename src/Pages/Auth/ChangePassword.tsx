@@ -1,6 +1,5 @@
 import { Button, Form, Input, Spin } from "antd";
 import { useState } from "react";
-import rentMeLogo from "../../assets/navLogo.png";
 import toast from "react-hot-toast";
 import { useChangePasswordMutation } from "@/redux/apiSlices/authSlice";
 

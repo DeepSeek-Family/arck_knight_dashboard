@@ -17,13 +17,13 @@ interface FormValues {
   phone: string;
 }
 
-interface AdminData {
-  name: string;
-  email: string;
-  address: string;
-  contact: string;
-  profileImg: string;
-}
+// interface AdminData {
+//   name: string;
+//   email: string;
+//   address: string;
+//   contact: string;
+//   profileImg: string;
+// }
 
 const PersonalInfo = () => {
   const [contact, setContact] = useState<string>("");
@@ -33,7 +33,7 @@ const PersonalInfo = () => {
 
 
   const { data: fetchAdminProfile, isLoading } = useFetchAdminProfileQuery();
-  const [updateAdminProfile, { isLoading: isUpdating }] = useUpdateAdminProfileMutation();
+  const [updateAdminProfile] = useUpdateAdminProfileMutation();
 
   // const fetchAdminProfile: { data?: AdminData } = {};
 
