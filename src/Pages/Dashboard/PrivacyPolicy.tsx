@@ -1,11 +1,11 @@
 import { useState, useRef } from "react";
 import JoditEditor from "jodit-react";
-import rentMeLogo from "../../assets/navLogo.png";
 import toast from "react-hot-toast";
 import {
   useGetPrivacyRoleQuery,
   useCreatePrivacyRuleMutation,
 } from "@/redux/apiSlices/ruleSlice";
+import Spinner from "@/components/common/Spinner";
 
 const PrivacyPolicy = () => {
   const editor = useRef<any>(null);
@@ -16,8 +16,8 @@ const PrivacyPolicy = () => {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <img src={rentMeLogo} alt="" />
+      <div className="flex items-center justify-between">
+        <Spinner />
       </div>
     );
   }

@@ -1,27 +1,38 @@
-import { useOverviewQuery, useRecentProjectQuery } from "@/redux/apiSlices/homeSlice";
-import { Spin } from "antd";
+import Spinner from "@/components/common/Spinner";
+import {
+  useOverviewQuery,
+  useRecentProjectQuery,
+} from "@/redux/apiSlices/homeSlice";
+
 import { FileText, Users, ArrowUpRight, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Home: React.FC = () => {
   const { data, isLoading } = useOverviewQuery();
-  const { data: recentProject, isLoading: recentProjectLoading } = useRecentProjectQuery();
+  const { data: recentProject, isLoading: recentProjectLoading } =
+    useRecentProjectQuery();
 
   // Function to convert Tailwind color classes to CSS gradient
   const getGradientStyle = (colorString: string) => {
     const colorMap: any = {
-      'from-yellow-400 to-amber-500': 'linear-gradient(to bottom right, #FBBF24, #F59E0B)',
-      'from-blue-400 to-indigo-500': 'linear-gradient(to bottom right, #60A5FA, #6366F1)',
-      'from-orange-400 to-orange-500': 'linear-gradient(to bottom right, #FB923C, #F97316)',
+      "from-yellow-400 to-amber-500":
+        "linear-gradient(to bottom right, #FBBF24, #F59E0B)",
+      "from-blue-400 to-indigo-500":
+        "linear-gradient(to bottom right, #60A5FA, #6366F1)",
+      "from-orange-400 to-orange-500":
+        "linear-gradient(to bottom right, #FB923C, #F97316)",
     };
-    
-    return colorMap[colorString] || 'linear-gradient(to bottom right, #60A5FA, #6366F1)';
+
+    return (
+      colorMap[colorString] ||
+      "linear-gradient(to bottom right, #60A5FA, #6366F1)"
+    );
   };
 
   if (isLoading || recentProjectLoading) {
     return (
       <div className="flex items-center justify-between">
-        <Spin size="large" />
+        <Spinner />
       </div>
     );
   }
@@ -53,7 +64,7 @@ const Home: React.FC = () => {
             <div
               className="absolute -top-10 -right-10 w-36 h-36 rounded-full opacity-20 blur-3xl"
               style={{
-                backgroundImage: getGradientStyle(stat?.color)
+                backgroundImage: getGradientStyle(stat?.color),
               }}
             ></div>
 
@@ -74,7 +85,7 @@ const Home: React.FC = () => {
                 <div
                   className="p-3 rounded-xl shadow-md flex items-center justify-center"
                   style={{
-                    backgroundImage: getGradientStyle(stat.color)
+                    backgroundImage: getGradientStyle(stat.color),
                   }}
                 >
                   {/* icon fix */}
@@ -131,8 +142,12 @@ const Home: React.FC = () => {
                   className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
                 >
                   <td className="py-5 px-6 text-gray-800">{project.name}</td>
-                  <td className="py-5 px-6 text-gray-600">{project.user.name}</td>
-                  <td className="py-5 px-6 text-gray-600">{project.createdAt}</td>
+                  <td className="py-5 px-6 text-gray-600">
+                    {project.user.name}
+                  </td>
+                  <td className="py-5 px-6 text-gray-600">
+                    {project.createdAt}
+                  </td>
                 </tr>
               ))}
             </tbody>

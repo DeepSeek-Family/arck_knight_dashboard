@@ -2,35 +2,30 @@ import { useState, useRef } from "react";
 import JoditEditor from "jodit-react";
 import Title from "../../components/common/Title";
 
-
-import rentMeLogo from "../../assets/navLogo.png";
-import { useCreateRuleMutation, useGetRulesQuery } from "@/redux/apiSlices/ruleSlice";
+import {
+  useCreateRuleMutation,
+  useGetRulesQuery,
+} from "@/redux/apiSlices/ruleSlice";
 import { message } from "antd";
+import Spinner from "@/components/common/Spinner";
 
 const TermsAndCondition = () => {
   const editor = useRef(null);
   const [content, setContent] = useState("");
 
+  const { data, isLoading } = useGetRulesQuery("terms");
 
-  const {
-    data,
-    isLoading,
-  } = useGetRulesQuery("terms");
-
-
-  const [createRule, { isLoading: isCreating }] = useCreateRuleMutation()
-
+  const [createRule, { isLoading: isCreating }] = useCreateRuleMutation();
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <img src={rentMeLogo} alt="" />
+      <div className="flex items-center justify-between">
+        <Spinner />
       </div>
     );
   }
 
   const termsAndConditionData = data?.data;
-
 
   return (
     <div className="p-6 bg-white">
@@ -38,7 +33,7 @@ const TermsAndCondition = () => {
 
       <JoditEditor
         ref={editor}
-        value={termsAndConditionData?.content || ''}
+        value={termsAndConditionData?.content || ""}
         onChange={(newContent) => {
           setContent(newContent);
         }}
@@ -49,7 +44,7 @@ const TermsAndCondition = () => {
           onClick={async () => {
             await createRule({
               type: "terms",
-              content: content || termsAndConditionData?.content
+              content: content || termsAndConditionData?.content,
             });
             message.success("Terms and Conditions updated successfully");
           }}
@@ -58,7 +53,6 @@ const TermsAndCondition = () => {
         >
           {isCreating ? "Creating..." : "Submit"}
         </button>
-
       </div>
     </div>
   );
