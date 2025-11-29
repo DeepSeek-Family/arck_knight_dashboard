@@ -1,0 +1,117 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  font-family: "Poppins", serif;
+  font-weight: 400;
+}
+
+/* ant design modal footer top margin remove */
+.ant-modal-footer {
+  margin-top: 0 !important;
+}
+/* 
+:root {
+  --primary-color: #5b2579;
+  --secondary-color: #f6e7ff;
+}
+
+.bg-primary {
+  background-color: var(--primary-color) !important;
+}
+.bg-secondary {
+  background-color: var(--secondary-color) !important;
+}
+
+.text-primary {
+  color: var(--primary-color) !important;
+}
+.text-secondary {
+  background-color: var(--secondary-color) !important;
+} */
+
+/* ant design menu option */
+.ant-menu-light .ant-menu-item {
+  color: #413f3f;
+}
+.ant-menu-item:hover {
+  background-color: #3f51b5 !important;
+  color: white !important;
+}
+
+.ant-menu-item-selected {
+  background-color: #3f51b5 !important;
+  color: white !important;
+  border-radius: 20 !important;
+  width: "100%" !important;
+}
+
+.ant-menu .ant-menu-item .ant-menu-item-icon + span {
+  transition: none !important;
+}
+
+.ant-menu-light .ant-menu-submenu-selected > .ant-menu-submenu-title {
+  color: #3f51b5 !important;
+}
+
+.ant-menu .ant-menu-title-content {
+  transition: none !important;
+}
+
+.ant-badge .ant-badge-count {
+  background: #e6e2e2 !important;
+  color: black !important;
+  border: 1px solid #e6e2e2 !important;
+}
+
+.ant-badge .ant-badge-count {
+  background: #3f51b5 !important;
+  color: white !important;
+  border: 1px solid #e6e2e2 !important;
+}
+
+.ant-btn:hover,
+.ant-btn:focus {
+  background-color: #13462c !important;
+  border-color: white !important;
+  color: white !important;
+  box-shadow: none !important;
+}
+
+.jodit-workplace {
+  height: 550px !important;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #dfdfdf00;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  /* background: #8b0000;  */
+  background: #ffffff67;
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #e6e2e2;
+}
+
+/* pagination style */
+.ant-pagination-item-active a {
+  color: white !important;
+}
+
+.ant-switch-checked {
+  background-color: #3f51b5 !important;
+}
