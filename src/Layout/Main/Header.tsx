@@ -5,7 +5,7 @@ import { useFetchAdminProfileQuery } from "../../redux/apiSlices/authSlice";
 interface UserData {
   name?: string;
   role?: string;
-  profileImg?: string;
+  image?: string;
 }
 
 interface AdminProfileResponse {
@@ -42,12 +42,7 @@ const Header = () => {
             width: 45,
             height: 45,
           }}
-          src={
-            userData?.data?.profileImg
-              ? `${(import.meta as any).env.VITE_BASE_URL}${userData?.data?.profileImg
-              }`
-              : logo
-          }
+          src={userData?.data?.image || logo}
           alt="person-male--v2"
           className="clip"
         />
