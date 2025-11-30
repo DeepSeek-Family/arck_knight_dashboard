@@ -18,7 +18,6 @@ const Header = () => {
     isLoading: boolean;
   };
 
-  console.log("User Data in Header:", userData);
 
   if (isLoading) {
     return (
@@ -45,9 +44,8 @@ const Header = () => {
           }}
           src={
             userData?.data?.profileImg
-              ? `${(import.meta as any).env.VITE_BASE_URL}${
-                  userData?.data?.profileImg
-                }`
+              ? `${(import.meta as any).env.VITE_BASE_URL}${userData?.data?.profileImg
+              }`
               : logo
           }
           alt="person-male--v2"
@@ -63,3 +61,4 @@ const Header = () => {
 };
 
 export default Header;
+

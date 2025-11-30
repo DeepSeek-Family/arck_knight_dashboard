@@ -138,12 +138,12 @@ const Home: React.FC = () => {
                   key={index}
                   className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
                 >
-                  <td className="py-5 px-6 text-gray-800">{project.name}</td>
+                  <td className="py-5 px-6 text-gray-800">{project?.name}</td>
                   <td className="py-5 px-6 text-gray-600">
-                    {project.user.name}
+                    {project?.user?.name}
                   </td>
                   <td className="py-5 px-6 text-gray-600">
-                    {project.createdAt}
+                    {project?.createdAt}
                   </td>
                 </tr>
               ))}
