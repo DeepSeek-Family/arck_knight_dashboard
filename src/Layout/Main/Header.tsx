@@ -1,4 +1,5 @@
 
+import { imageUrl } from "@/redux/api/baseApi";
 import logo from "../../assets/randomProfile2.jpg";
 import { useFetchAdminProfileQuery } from "../../redux/apiSlices/authSlice";
 
@@ -27,6 +28,8 @@ const Header = () => {
     );
   }
 
+
+
   return (
     <div className="flex items-center gap-5 justify-end">
       {/* <Link to="/notification" className="h-fit mt-[10px]">
@@ -42,7 +45,11 @@ const Header = () => {
             width: 45,
             height: 45,
           }}
-          src={userData?.data?.image || logo}
+          src={
+            userData?.data?.image
+              ? `${imageUrl + (userData?.data?.image || "No image URL")}`
+              : logo
+          }
           alt="person-male--v2"
           className="clip"
         />
