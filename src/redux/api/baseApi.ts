@@ -14,7 +14,7 @@ const baseQueryWithReauth: BaseQueryFn<
   FetchBaseQueryError
 > = async (args, api, extraOptions) => {
   const baseQuery = fetchBaseQuery({
-    baseUrl: "http://193.46.198.251:5000/api/v1",
+    baseUrl: "https://api.arcaknightalternatives.com/api/v1",
     prepareHeaders: (headers) => {
       const token =
         localStorage.getItem("authToken") ||
@@ -102,4 +102,4 @@ export const api = createApi({
 });
 
 // Export the image URL as a constant
-export const imageUrl = "http://193.46.198.251:5000";
+export const imageUrl = "https://rakib5002.binarybards.online";
