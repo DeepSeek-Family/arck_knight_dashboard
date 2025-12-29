@@ -1,12 +1,8 @@
-import { useState, useRef } from "react";
-import JoditEditor from "jodit-react";
-import Title from "../../components/common/Title";
+
 
 import {
-  useCreateRuleMutation,
   useGetRulesQuery,
 } from "@/redux/apiSlices/ruleSlice";
-import { message } from "antd";
 import Spinner from "@/components/common/Spinner";
 
 const TermsAndConditionPublic = () => {
