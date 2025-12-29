@@ -24,15 +24,18 @@ import RawMaterial from "../Pages/Dashboard/RawMaterial";
 import StandardRecipe from "../Pages/Dashboard/StandardRecipe";
 import SingleQuoteUpdate from "../Pages/Dashboard/SingleQuoteUpdate";
 import SingleQuoteHistory from "../Pages/Dashboard/SingleQuoteHistory";
+import PrivateRoute from "./PrivateRoute";
+import PrivacyPolicyPublic from "@/Pages/Dashboard/PrivacyPolicyPublic";
+import TermsAndConditionPublic from "@/Pages/Dashboard/TermsAndConditionPublic";
 
 const router = createBrowserRouter([
   {
     path: "/",
     // element: <ProtectedRoute><Main /></ProtectedRoute> ,
     element: (
-      // <PrivateRoute>
-      <Main />
-      // </PrivateRoute>
+      <PrivateRoute>
+        <Main />
+      </PrivateRoute>
     ),
     children: [
       {
@@ -72,6 +75,10 @@ const router = createBrowserRouter([
         element: <QuoteUpdate />,
       },
       {
+        path: "/terms-and-condition",
+        element: <TermsAndCondition />,
+      },
+      {
         path: "/raw-material",
         element: <RawMaterial />,
       },
@@ -83,6 +90,11 @@ const router = createBrowserRouter([
       {
         path: "/personal-information",
         element: <UserProfile />,
+      },
+
+      {
+        path: "/privacy-policy",
+        element: <PrivacyPolicy />,
       },
       {
         path: "/change-password",
@@ -99,15 +111,6 @@ const router = createBrowserRouter([
       },
 
       {
-        path: "/privacy-policy",
-        element: <PrivacyPolicy />,
-      },
-      {
-        path: "/terms-and-condition",
-        element: <TermsAndCondition />,
-      },
-
-      {
         path: "/change-password",
         element: <ChangePassword />,
       },
@@ -121,6 +124,14 @@ const router = createBrowserRouter([
         element: <Notifications />,
       },
     ],
+  },
+  {
+    path: "/public/privacy-policy",
+    element: <PrivacyPolicyPublic />,
+  },
+  {
+    path: "/public/terms-and-condition",
+    element: <TermsAndConditionPublic />,
   },
   {
     path: "/auth",
