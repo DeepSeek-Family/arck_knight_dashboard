@@ -27,6 +27,7 @@ import SingleQuoteHistory from "../Pages/Dashboard/SingleQuoteHistory";
 import PrivateRoute from "./PrivateRoute";
 import PrivacyPolicyPublic from "@/Pages/Dashboard/PrivacyPolicyPublic";
 import TermsAndConditionPublic from "@/Pages/Dashboard/TermsAndConditionPublic";
+import AccountDeletionInstructions from "@/Pages/Dashboard/AccountDeletionInstructions";
 
 const router = createBrowserRouter([
   {
@@ -132,6 +133,10 @@ const router = createBrowserRouter([
   {
     path: "/public/terms-and-condition",
     element: <TermsAndConditionPublic />,
+  },
+  {
+    path: "/public/account-deletion-instructions",
+    element: <AccountDeletionInstructions />,
   },
   {
     path: "/auth",
